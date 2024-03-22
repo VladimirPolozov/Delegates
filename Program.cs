@@ -353,23 +353,13 @@ namespace EventsDelegates
       return new SquareMatrix(minor);
     }
 
-    // Метод, использующий делегат для приведения матрицы к диагональному виду
     public void DiagonalizeMatrix(SquareMatrix matrix, DiagonalizeMatrixDelegate diagonalizeMethod)
     {
       diagonalizeMethod(matrix);
     }
 
-    public static SquareMatrix PerformMatrixOperation(MatrixOperationDelegate operationDelegate, SquareMatrix firstMatrix, SquareMatrix secondMatrix)
+    public static DiagonalizeMatrixDelegate diagonalize = delegate (SquareMatrix matrix)
     {
-      return operationDelegate(firstMatrix, secondMatrix);
-    }
-
-    public static bool PerformMatrixComparisonDelegate(MatrixComparisonDelegate operationDelegate, SquareMatrix firstMatrix, SquareMatrix secondMatrix)
-    {
-      return operationDelegate(firstMatrix, secondMatrix);
-    }
-
-    public static DiagonalizeMatrixDelegate diagonalize = delegate (SquareMatrix matrix) {
       var result = matrix.Clone();
       for (int rowIndex = 0; rowIndex < matrix.Extension; ++rowIndex)
       {
@@ -423,108 +413,268 @@ namespace EventsDelegates
     public DifferentSizesException(string message, System.Exception inner) : base(message, inner) { }
   }
 
-  class Programm
+  public abstract class BaseMenuHandler
   {
-    static void Main(string[] args)
+    public BaseMenuHandler NextHandler { get; set; }
+
+    public virtual void SetNextHandler(BaseMenuHandler nextHandler)
     {
-      bool isWorking = true;
-      bool isCalcMode;
-      string userChoise;
-      string operationChoose;
+      NextHandler = nextHandler;
+    }
 
-      MatrixOperationDelegate additionDelegate = (first, second) => first + second;
-      MatrixOperationDelegate subtractionDelegate = (first, second) => first - second;
-      MatrixOperationDelegate multiplicationDelegate = (first, second) => first * second;
-      MatrixComparisonDelegate lessThanDelegate = (first, second) => first < second;
-      MatrixComparisonDelegate lessThanOrEqualDelegate = (first, second) => first <= second;
-      MatrixComparisonDelegate greaterThanDelegate = (first, second) => first > second;
-      MatrixComparisonDelegate greaterThanOrEqualDelegate = (first, second) => first >= second;
-      MatrixComparisonDelegate equalityDelegate = (first, second) => first == second;
-      MatrixComparisonDelegate inequalityDelegate = (first, second) => first != second;
+    public abstract void Handle(string userInput, SquareMatrix firstMatrix, SquareMatrix secondMatrix);
+  }
 
-      Console.Write("Введите размерность для первой матрицы (одно число - матрица квадратная): ");
-      int firstMatrixExtension = Convert.ToInt32(Console.ReadLine());
-      SquareMatrix firstMatrix = new SquareMatrix(GetMatrixElements(firstMatrixExtension));
-      Console.WriteLine("Матрица 1 создана:");
-      Console.Write(firstMatrix.ToString());
-      Console.Write("Введите размерность для второй матрицы (такую же, как и у первой, чтобы производить операции с данными матрицами): ");
-      int secondMatrixExtension = Convert.ToInt32(Console.ReadLine());
-      SquareMatrix secondMatrix = new SquareMatrix(GetMatrixElements(secondMatrixExtension));
-      Console.WriteLine("Матрица 2 создана:");
-      Console.Write(secondMatrix.ToString());
-
-      while (isWorking)
+  public class IsProgrammWorkingCheckHandler : BaseMenuHandler {
+    public override void Handle(string userInput, SquareMatrix firstMatrix, SquareMatrix secondMatrix)
+    {
+      if (userInput == "0")
       {
-        Console.Write("Выбор действий:\n1 - Продемонстрировать работу программы\n2 - Выполнить операции с матрицами\n0 - Выйти\nВведите число: ");
-        userChoise = Console.ReadLine();
-
-        switch (userChoise)
-        {
-          case "0":
-            isWorking = false;
-            break;
-          case "1":
-            ShowTest();
-            break;
-          case "2":
-            isCalcMode = true;
-
-            while (isCalcMode)
-            {
-              Console.Write("Доступные операции: +, -, *, >, >=, <, <=, ==, !=, 0 - выйти\nВведите символ операции: ");
-              operationChoose = Console.ReadLine();
-
-              switch (operationChoose)
-              {
-                case "0":
-                  isCalcMode = false;
-                  break;
-                case "+":
-                  Console.WriteLine("Результат операции сложения:");
-                  SquareMatrix sumOfMatrix = PerformMatrixOperation(additionDelegate, firstMatrix, secondMatrix);
-                  Console.WriteLine(sumOfMatrix.ToString());
-                  break;
-                case "-":
-                  Console.WriteLine("Результат операции вычитания:");
-                  SquareMatrix subtractionOfMatrix = PerformMatrixOperation(subtractionDelegate, firstMatrix, secondMatrix);
-                  Console.WriteLine(subtractionOfMatrix.ToString());
-                  break;
-                case "*":
-                  Console.WriteLine("Результат операции умножения:");
-                  SquareMatrix multiplicationOfMatrix = PerformMatrixOperation(multiplicationDelegate, firstMatrix, secondMatrix);
-                  Console.WriteLine(multiplicationOfMatrix.ToString());
-                  break;
-                case ">":
-                  Console.WriteLine($"Матрица 1 > Матрица 2: {PerformMatrixComparisonDelegate(greaterThanDelegate, firstMatrix, secondMatrix)}");
-                  break;
-                case ">=":
-                  Console.WriteLine($"Матрица 1 >= Матрица 2: {PerformMatrixComparisonDelegate(greaterThanOrEqualDelegate, firstMatrix, secondMatrix)}");
-                  break;
-                case "<":
-                  Console.WriteLine($"Матрица 1 < Матрица 2: {PerformMatrixComparisonDelegate(lessThanDelegate, firstMatrix, secondMatrix)}");
-                  break;
-                case "<=":
-                  Console.WriteLine($"Матрица 1 <= Матрица 2: {PerformMatrixComparisonDelegate(lessThanOrEqualDelegate, firstMatrix, secondMatrix)}");
-                  break;
-                case "==":
-                  Console.WriteLine($"Матрица 1 == Матрица 2: {PerformMatrixComparisonDelegate(equalityDelegate, firstMatrix, secondMatrix)}");
-                  break;
-                case "!=":
-                  Console.WriteLine($"Матрица 1 != Матрица 2: {PerformMatrixComparisonDelegate(inequalityDelegate, firstMatrix, secondMatrix)}");
-                  break;
-                default:
-                  Console.WriteLine("Данная операция не реализована");
-                  break;
-              }
-            }
-
-            break;
-        }
+        MenuApplication.IsWorking = false;
+        Console.WriteLine("\nРабота программы завершена");
+      } else
+      {
+        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
       }
+    }
+  }
 
-      Console.WriteLine("\nВыполнение программы завершено,\nНажмите любую клавишу, чтобы закрыть это окно");
-      // Ожидание нажатия клавиши (чтобы окно не закрывалось сразу после выполнения программы)
-      Console.ReadKey();
+  public class AdditionMatrixHandler : BaseMenuHandler
+  {
+    public override void Handle(string userInput, SquareMatrix firstMatrix, SquareMatrix secondMatrix)
+    {
+      if (userInput.Contains("+"))
+      {
+        Console.WriteLine("\nРезультат операции сложения:");
+        SquareMatrix sumOfMatrix = firstMatrix + secondMatrix;
+        Console.WriteLine(sumOfMatrix.ToString());
+      } else
+      {
+        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
+      }
+    }
+  }
+  public class SubtractionMatrixHandler : BaseMenuHandler
+  {
+    public override void Handle(string userInput, SquareMatrix firstMatrix, SquareMatrix secondMatrix)
+    {
+      if (userInput.Contains("-"))
+      {
+        Console.WriteLine("\nРезультат операции вычитания:");
+        SquareMatrix multiplicationOfMatrix = firstMatrix - secondMatrix;
+        Console.WriteLine(multiplicationOfMatrix.ToString());
+      } else
+      {
+        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
+      }
+    }
+  }
+
+  public class MultiplicationMatrixHandler : BaseMenuHandler
+  {
+    public override void Handle(string userInput, SquareMatrix firstMatrix, SquareMatrix secondMatrix)
+    {
+      if (userInput.Contains("*"))
+      {
+        Console.WriteLine("\nРезультат операции умножения:");
+        SquareMatrix multiplicationOfMatrix = firstMatrix * secondMatrix;
+        Console.WriteLine(multiplicationOfMatrix.ToString());
+      } else
+      {
+        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
+      }
+    }
+  }
+
+  public class LessThanMatrixHandler : BaseMenuHandler
+  {
+    public override void Handle(string userInput, SquareMatrix firstMatrix, SquareMatrix secondMatrix)
+    {
+      if (userInput.Contains("<"))
+      {
+        Console.WriteLine($"\nМатрица 1 < Матрица 2: {firstMatrix < secondMatrix}");
+      } else
+      {
+        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
+      }
+    }
+  }
+
+  public class LessThanOrEqualMatrixHandler : BaseMenuHandler
+  {
+    public override void Handle(string userInput, SquareMatrix firstMatrix, SquareMatrix secondMatrix)
+    {
+      if (userInput.Contains("<="))
+      {
+        Console.WriteLine($"\nМатрица 1 <= Матрица 2: {firstMatrix <= secondMatrix}");
+      } else
+      {
+        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
+      }
+    }
+  }
+
+  public class GreaterThanMatrixHandler : BaseMenuHandler
+  {
+    public override void Handle(string userInput, SquareMatrix firstMatrix, SquareMatrix secondMatrix)
+    {
+      if (userInput.Contains(">"))
+      {
+        Console.WriteLine($"\nМатрица 1 > Матрица 2: {firstMatrix > secondMatrix}");
+      } else
+      {
+        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
+      }
+    }
+  }
+
+  public class GreaterThanOrEqualMatrixHandler : BaseMenuHandler
+  {
+    public override void Handle(string userInput, SquareMatrix firstMatrix, SquareMatrix secondMatrix)
+    {
+      if (userInput.Contains(">="))
+      {
+        Console.WriteLine($"\nМатрица 1 >= Матрица 2: {firstMatrix >= secondMatrix}");
+      } else
+      {
+        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
+      }
+    }
+  }
+  public class EqualityMatrixHandler : BaseMenuHandler
+  {
+    public override void Handle(string userInput, SquareMatrix firstMatrix, SquareMatrix secondMatrix)
+    {
+      if (userInput.Contains("=="))
+      {
+        Console.WriteLine($"\nМатрица 1 == Матрица 2: {firstMatrix == secondMatrix}");
+      } else
+      {
+        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
+      }
+    }
+  }
+
+  public class InequalityMatrixHandler : BaseMenuHandler
+  {
+    public override void Handle(string userInput, SquareMatrix firstMatrix, SquareMatrix secondMatrix)
+    {
+      if (userInput.Contains("!="))
+      {
+        Console.WriteLine($"\nМатрица 1 != Матрица 2: {firstMatrix != secondMatrix}");
+      } else
+      {
+        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
+      }
+    }
+  }
+
+  public class TransposeMatrixHandler : BaseMenuHandler
+  {
+    public override void Handle(string userInput, SquareMatrix firstMatrix, SquareMatrix secondMatrix)
+    {
+      if (userInput.Contains("transpose"))
+      {
+        Console.WriteLine("\nТранспонированная матрица 1:");
+        Console.WriteLine(firstMatrix.CalculateTransposeMatrix().ToString());
+        Console.WriteLine("\nТранспонированная матрица 2:");
+        Console.WriteLine(secondMatrix.CalculateTransposeMatrix().ToString());
+      } else
+      {
+        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
+      }
+    }
+  }
+
+  public class DeterminantMatrixHandler : BaseMenuHandler
+  {
+    public override void Handle(string userInput, SquareMatrix firstMatrix, SquareMatrix secondMatrix)
+    {
+      if (userInput.Contains("determinant"))
+      {
+        Console.WriteLine("\nДетерминант матрицы 1:");
+        Console.WriteLine(CalculateDeterminant(firstMatrix));
+        Console.WriteLine("\nДетерминант матрицы 2:");
+        Console.WriteLine(CalculateDeterminant(secondMatrix));
+      } else
+      {
+        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
+      }
+    }
+  }
+
+  public class TraceMatrixHandler : BaseMenuHandler
+  {
+    public override void Handle(string userInput, SquareMatrix firstMatrix, SquareMatrix secondMatrix)
+    {
+      if (userInput.Contains("trace"))
+      {
+        Console.WriteLine("\nСлед матрицы 1:");
+        Console.WriteLine(firstMatrix.CalculateMatrixTrace());
+        Console.WriteLine("\nСлед матрицы 2:");
+        Console.WriteLine(secondMatrix.CalculateMatrixTrace());
+      } else
+      {
+        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
+      }
+    }
+  }
+
+  public class DiagonalizeMatrixHandler : BaseMenuHandler
+  {
+    public override void Handle(string userInput, SquareMatrix firstMatrix, SquareMatrix secondMatrix)
+    {
+      if (userInput.Contains("diagonalize"))
+      {
+        Console.WriteLine("\nМатрица 1, приведенная к диагольному виду:");
+        Console.WriteLine(diagonalize(firstMatrix));
+        Console.WriteLine("\nМатрица 1, приведенная к диагольному виду:");
+        Console.WriteLine(diagonalize(secondMatrix));
+      } else
+      {
+        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
+      }
+    }
+  }
+
+  public class DefaultHandler : BaseMenuHandler
+  {
+    public override void Handle(string userInput, SquareMatrix firstMatrix, SquareMatrix secondMatrix)
+    {
+      Console.WriteLine("Не удалось выполнить ни одной операции по данному запросу");
+    }
+  }
+
+  public class MenuApplication
+  {
+    public static bool IsWorking { get; set; }
+    private BaseMenuHandler menuHandler;
+
+    public MenuApplication(BaseMenuHandler menuHandler)
+    {
+      this.menuHandler = menuHandler;
+    }
+
+    public void Run()
+    {
+      while (IsWorking)
+      {
+        Console.Write("Введите размерность для первой матрицы (одно число - матрица квадратная): ");
+        int firstMatrixExtension = Convert.ToInt32(Console.ReadLine());
+        SquareMatrix firstMatrix = new SquareMatrix(GetMatrixElements(firstMatrixExtension));
+        Console.WriteLine("Матрица 1 создана:");
+        Console.Write(firstMatrix.ToString());
+        Console.Write("Введите размерность для второй матрицы (такую же, как и у первой, чтобы производить операции с данными матрицами): ");
+        int secondMatrixExtension = Convert.ToInt32(Console.ReadLine());
+        SquareMatrix secondMatrix = new SquareMatrix(GetMatrixElements(secondMatrixExtension));
+        Console.WriteLine("Матрица 2 создана:");
+        Console.Write(secondMatrix.ToString());
+
+        Console.Write("Доступные операции: +, -, *, >, >=, <, <=, ==, !=, transpose, trace, diagonalize, 0 - выйти\nПример ввода:\"+*-trace!= ==diagonalize\"Выберите операции: ");
+        string userInput = Console.ReadLine();
+
+        menuHandler.Handle(userInput, firstMatrix, secondMatrix);
+      }
     }
 
     static int[] GetMatrixElements(int extesion)
@@ -537,87 +687,47 @@ namespace EventsDelegates
       }
       return elements;
     }
+  }
 
-    static void ShowTest()
+  class Programm
+  {
+    static void Main(string[] args)
     {
-      Console.WriteLine("\nСоздание случайной матрицы 3x3:");
-      SquareMatrix mymatrix = new SquareMatrix();
-      mymatrix.AutoFill(3);
-      Console.Write(mymatrix.ToString());
-      Console.WriteLine("Создание случайной матрицы 3x3:");
-      SquareMatrix mymatrix2 = new SquareMatrix();
-      mymatrix2.AutoFill(3);
-      Console.Write(mymatrix2.ToString());
+      BaseMenuHandler additionHandler = new AdditionMatrixHandler();
+      BaseMenuHandler subtractionHandler = new SubtractionMatrixHandler();
+      BaseMenuHandler multiplicationHandler = new MultiplicationMatrixHandler();
+      BaseMenuHandler lessThanHandler = new LessThanMatrixHandler();
+      BaseMenuHandler lessThanOrEqualHandler = new LessThanOrEqualMatrixHandler();
+      BaseMenuHandler greaterThanHandler = new GreaterThanMatrixHandler();
+      BaseMenuHandler greaterThanOrEqualHandler = new GreaterThanOrEqualMatrixHandler();
+      BaseMenuHandler equalityHandler = new EqualityMatrixHandler();
+      BaseMenuHandler inequalityHandler = new InequalityMatrixHandler();
+      BaseMenuHandler transposeHandler = new TransposeMatrixHandler();
+      BaseMenuHandler determinantHandler = new DeterminantMatrixHandler();
+      BaseMenuHandler traceHandler = new TraceMatrixHandler();
+      BaseMenuHandler diagonalizeHandler = new DiagonalizeMatrixHandler();
+      DefaultHandler defaultHandler = new DefaultHandler();
 
-      Console.WriteLine("\nТест операций сложения, вычитания и умножения");
+      additionHandler.SetNextHandler(subtractionHandler);
+      subtractionHandler.SetNextHandler(multiplicationHandler);
+      multiplicationHandler.SetNextHandler(lessThanHandler);
+      lessThanHandler.SetNextHandler(lessThanOrEqualHandler);
+      lessThanOrEqualHandler.SetNextHandler(greaterThanHandler);
+      greaterThanHandler.SetNextHandler(greaterThanOrEqualHandler);
+      greaterThanOrEqualHandler.SetNextHandler(equalityHandler);
+      equalityHandler.SetNextHandler(inequalityHandler);
+      inequalityHandler.SetNextHandler(transposeHandler);
+      transposeHandler.SetNextHandler(determinantHandler);
+      determinantHandler.SetNextHandler(traceHandler);
+      traceHandler.SetNextHandler(diagonalizeHandler);
+      diagonalizeHandler.SetNextHandler(defaultHandler);
 
-      Console.WriteLine("\nРезультат операции сложения:");
-      SquareMatrix sumOfMatrix = mymatrix + mymatrix2;
-      Console.Write(sumOfMatrix.ToString());
+      MenuApplication menuApp = new MenuApplication(additionHandler);
+      menuApp.Run();
 
-      Console.WriteLine("\nРезультат операции вычитания:");
-      SquareMatrix subOfMatrix = mymatrix - mymatrix2;
-      Console.Write(subOfMatrix.ToString());
-
-      Console.WriteLine("\nРезультат операции умножения:");
-      SquareMatrix multiOfMatrix = mymatrix * mymatrix2;
-      Console.Write(multiOfMatrix.ToString());
-
-      Console.WriteLine("\nТест операций сравнения");
-      int[] minorMatrixArray = new int[4] { 0, 1, 2, 3 };
-      int[] majorMatrixArray = new int[4] { 1, 2, 3, 4 };
-      int[] equalMatrixArray = new int[4] { 0, 1, 2, 3 };
-      SquareMatrix minorMatrix = new SquareMatrix(minorMatrixArray);
-      SquareMatrix majorMatrix = new SquareMatrix(majorMatrixArray);
-      SquareMatrix equalMatrix = new SquareMatrix(equalMatrixArray);
-      Console.WriteLine("\nminorMatrix:");
-      Console.Write(minorMatrix.ToString());
-      Console.WriteLine("\nmajorMatrix:");
-      Console.Write(majorMatrix.ToString());
-      Console.WriteLine("\nequalMatrix:");
-      Console.Write(equalMatrix.ToString());
-
-      Console.WriteLine($"\nmajorMatrix > minorMatrix: {majorMatrix > minorMatrix}");
-      Console.WriteLine($"minorMatrix > majorMatrix: {minorMatrix > majorMatrix}");
-      Console.WriteLine($"minorMatrix > equalMatrix: {minorMatrix > equalMatrix}");
-
-      Console.WriteLine($"majorMatrix < minorMatrix: {majorMatrix < minorMatrix}");
-      Console.WriteLine($"minorMatrix < majorMatrix: {minorMatrix < majorMatrix}");
-      Console.WriteLine($"minorMatrix < equalMatrix: {minorMatrix < equalMatrix}");
-
-      Console.WriteLine($"minorMatrix == majorMatrix: {minorMatrix == majorMatrix}");
-      Console.WriteLine($"minorMatrix != majorMatrix: {minorMatrix != majorMatrix}");
-      Console.WriteLine($"minorMatrix == equalMatrix: {minorMatrix == equalMatrix}");
-      Console.WriteLine($"minorMatrix != equalMatrix: {minorMatrix != equalMatrix}");
-
-      Console.WriteLine("\nТест операции нахождения обратной матрицы для матрицы 1:");
-      SquareMatrix transposeMatrix = mymatrix.CalculateTransposeMatrix();
-      Console.Write(transposeMatrix.ToString());
-
-      Console.Write("\nТест операции нахождения следа матрицы для матрицы 1: ");
-      int matrixTrace = mymatrix.CalculateMatrixTrace();
-      Console.WriteLine(matrixTrace.ToString());
-
-      Console.WriteLine("\nТест операции приведения матрицы к диагональному виду для матрицы 1:");
-      SquareMatrix diagonalMatrix = diagonalize(mymatrix);
-      Console.Write(diagonalMatrix.ToString());
-
-      Console.WriteLine("\nТест операций приведения типов");
-      Console.WriteLine("\nМатрица -> двумерный массив:");
-      int[,] matrixToArray = new int[2, 2];
-      matrixToArray = (int[,])minorMatrix;
-      Console.WriteLine(matrixToArray);
-
-      Console.WriteLine("\nМатрица -> строка:");
-      string matrixToString;
-      matrixToString = (string)majorMatrix;
-      Console.WriteLine(matrixToString);
-
-      Console.WriteLine("Одномерный массив -> матрица:");
-      int[] arrayToMatrix = new int[4] { 0, 1, 2, 3 };
-      SquareMatrix newMatrix = arrayToMatrix;
-      Console.Write(newMatrix.ToString());
-      Console.WriteLine();
+      Console.WriteLine("\nВыполнение программы завершено,\nНажмите любую клавишу, чтобы закрыть это окно");
+      // Ожидание нажатия клавиши (чтобы окно не закрывалось сразу после выполнения программы)
+      Console.ReadKey();
     }
   }
 }
