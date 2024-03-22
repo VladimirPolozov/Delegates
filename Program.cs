@@ -425,33 +425,17 @@ namespace EventsDelegates
     public abstract void Handle(string userInput, SquareMatrix firstMatrix, SquareMatrix secondMatrix);
   }
 
-  public class IsProgrammWorkingCheckHandler : BaseMenuHandler {
-    public override void Handle(string userInput, SquareMatrix firstMatrix, SquareMatrix secondMatrix)
-    {
-      if (userInput == "0")
-      {
-        MenuApplication.IsWorking = false;
-        Console.WriteLine("\nРабота программы завершена");
-      } else
-      {
-        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
-      }
-    }
-  }
-
   public class AdditionMatrixHandler : BaseMenuHandler
   {
     public override void Handle(string userInput, SquareMatrix firstMatrix, SquareMatrix secondMatrix)
     {
       if (userInput.Contains("+"))
       {
-        Console.WriteLine("\nРезультат операции сложения:");
+        Console.WriteLine("Результат операции сложения:");
         SquareMatrix sumOfMatrix = firstMatrix + secondMatrix;
         Console.WriteLine(sumOfMatrix.ToString());
-      } else
-      {
-        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
       }
+      NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
     }
   }
   public class SubtractionMatrixHandler : BaseMenuHandler
@@ -460,13 +444,11 @@ namespace EventsDelegates
     {
       if (userInput.Contains("-"))
       {
-        Console.WriteLine("\nРезультат операции вычитания:");
+        Console.WriteLine("Результат операции вычитания:");
         SquareMatrix multiplicationOfMatrix = firstMatrix - secondMatrix;
         Console.WriteLine(multiplicationOfMatrix.ToString());
-      } else
-      {
-        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
       }
+      NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
     }
   }
 
@@ -476,13 +458,11 @@ namespace EventsDelegates
     {
       if (userInput.Contains("*"))
       {
-        Console.WriteLine("\nРезультат операции умножения:");
+        Console.WriteLine("Результат операции умножения:");
         SquareMatrix multiplicationOfMatrix = firstMatrix * secondMatrix;
         Console.WriteLine(multiplicationOfMatrix.ToString());
-      } else
-      {
-        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
       }
+      NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
     }
   }
 
@@ -492,11 +472,10 @@ namespace EventsDelegates
     {
       if (userInput.Contains("<"))
       {
-        Console.WriteLine($"\nМатрица 1 < Матрица 2: {firstMatrix < secondMatrix}");
-      } else
-      {
-        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
+        Console.WriteLine($"Матрица 1 < Матрица 2: {firstMatrix < secondMatrix}");
+        Console.WriteLine();
       }
+      NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
     }
   }
 
@@ -506,11 +485,10 @@ namespace EventsDelegates
     {
       if (userInput.Contains("<="))
       {
-        Console.WriteLine($"\nМатрица 1 <= Матрица 2: {firstMatrix <= secondMatrix}");
-      } else
-      {
-        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
+        Console.WriteLine($"Матрица 1 <= Матрица 2: {firstMatrix <= secondMatrix}");
+        Console.WriteLine();
       }
+      NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
     }
   }
 
@@ -520,11 +498,10 @@ namespace EventsDelegates
     {
       if (userInput.Contains(">"))
       {
-        Console.WriteLine($"\nМатрица 1 > Матрица 2: {firstMatrix > secondMatrix}");
-      } else
-      {
-        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
+        Console.WriteLine($"Матрица 1 > Матрица 2: {firstMatrix > secondMatrix}");
+        Console.WriteLine();
       }
+      NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
     }
   }
 
@@ -534,11 +511,10 @@ namespace EventsDelegates
     {
       if (userInput.Contains(">="))
       {
-        Console.WriteLine($"\nМатрица 1 >= Матрица 2: {firstMatrix >= secondMatrix}");
-      } else
-      {
-        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
+        Console.WriteLine($"Матрица 1 >= Матрица 2: {firstMatrix >= secondMatrix}");
+        Console.WriteLine();
       }
+      NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
     }
   }
   public class EqualityMatrixHandler : BaseMenuHandler
@@ -547,11 +523,10 @@ namespace EventsDelegates
     {
       if (userInput.Contains("=="))
       {
-        Console.WriteLine($"\nМатрица 1 == Матрица 2: {firstMatrix == secondMatrix}");
-      } else
-      {
-        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
+        Console.WriteLine($"Матрица 1 == Матрица 2: {firstMatrix == secondMatrix}");
+        Console.WriteLine();
       }
+      NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
     }
   }
 
@@ -561,11 +536,10 @@ namespace EventsDelegates
     {
       if (userInput.Contains("!="))
       {
-        Console.WriteLine($"\nМатрица 1 != Матрица 2: {firstMatrix != secondMatrix}");
-      } else
-      {
-        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
+        Console.WriteLine($"Матрица 1 != Матрица 2: {firstMatrix != secondMatrix}");
+        Console.WriteLine();
       }
+      NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
     }
   }
 
@@ -575,14 +549,12 @@ namespace EventsDelegates
     {
       if (userInput.Contains("transpose"))
       {
-        Console.WriteLine("\nТранспонированная матрица 1:");
+        Console.WriteLine("Транспонированная матрица 1:");
         Console.WriteLine(firstMatrix.CalculateTransposeMatrix().ToString());
-        Console.WriteLine("\nТранспонированная матрица 2:");
+        Console.WriteLine("Транспонированная матрица 2:");
         Console.WriteLine(secondMatrix.CalculateTransposeMatrix().ToString());
-      } else
-      {
-        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
       }
+      NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
     }
   }
 
@@ -592,14 +564,13 @@ namespace EventsDelegates
     {
       if (userInput.Contains("determinant"))
       {
-        Console.WriteLine("\nДетерминант матрицы 1:");
+        Console.Write("Детерминант матрицы 1: ");
         Console.WriteLine(CalculateDeterminant(firstMatrix));
-        Console.WriteLine("\nДетерминант матрицы 2:");
+        Console.Write("Детерминант матрицы 2: ");
         Console.WriteLine(CalculateDeterminant(secondMatrix));
-      } else
-      {
-        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
+        Console.WriteLine();
       }
+      NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
     }
   }
 
@@ -609,14 +580,13 @@ namespace EventsDelegates
     {
       if (userInput.Contains("trace"))
       {
-        Console.WriteLine("\nСлед матрицы 1:");
+        Console.Write("След матрицы 1: ");
         Console.WriteLine(firstMatrix.CalculateMatrixTrace());
-        Console.WriteLine("\nСлед матрицы 2:");
+        Console.Write("След матрицы 2: ");
         Console.WriteLine(secondMatrix.CalculateMatrixTrace());
-      } else
-      {
-        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
+        Console.WriteLine();
       }
+      NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
     }
   }
 
@@ -626,22 +596,12 @@ namespace EventsDelegates
     {
       if (userInput.Contains("diagonalize"))
       {
-        Console.WriteLine("\nМатрица 1, приведенная к диагольному виду:");
+        Console.WriteLine("Матрица 1, приведенная к диагольному виду:");
         Console.WriteLine(diagonalize(firstMatrix));
-        Console.WriteLine("\nМатрица 1, приведенная к диагольному виду:");
+        Console.WriteLine("Матрица 1, приведенная к диагольному виду:");
         Console.WriteLine(diagonalize(secondMatrix));
-      } else
-      {
-        NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
       }
-    }
-  }
-
-  public class DefaultHandler : BaseMenuHandler
-  {
-    public override void Handle(string userInput, SquareMatrix firstMatrix, SquareMatrix secondMatrix)
-    {
-      Console.WriteLine("Не удалось выполнить ни одной операции по данному запросу");
+      NextHandler?.Handle(userInput, firstMatrix, secondMatrix);
     }
   }
 
@@ -652,6 +612,7 @@ namespace EventsDelegates
 
     public MenuApplication(BaseMenuHandler menuHandler)
     {
+      IsWorking = true;
       this.menuHandler = menuHandler;
     }
 
@@ -670,10 +631,16 @@ namespace EventsDelegates
         Console.WriteLine("Матрица 2 создана:");
         Console.Write(secondMatrix.ToString());
 
-        Console.Write("Доступные операции: +, -, *, >, >=, <, <=, ==, !=, transpose, trace, diagonalize, 0 - выйти\nПример ввода:\"+*-trace!= ==diagonalize\"Выберите операции: ");
+        Console.Write("Доступные операции: +, -, *, >, >=, <, <=, ==, !=, transpose, trace, diagonalize\nВведите операции через пробел: ");
         string userInput = Console.ReadLine();
-
         menuHandler.Handle(userInput, firstMatrix, secondMatrix);
+
+        Console.Write("Продолжить выполнение программы? ");
+        userInput = Console.ReadLine();
+        if (userInput.ToLower() == "нет")
+        {
+          IsWorking = false;
+        }
       }
     }
 
@@ -706,7 +673,6 @@ namespace EventsDelegates
       BaseMenuHandler determinantHandler = new DeterminantMatrixHandler();
       BaseMenuHandler traceHandler = new TraceMatrixHandler();
       BaseMenuHandler diagonalizeHandler = new DiagonalizeMatrixHandler();
-      DefaultHandler defaultHandler = new DefaultHandler();
 
       additionHandler.SetNextHandler(subtractionHandler);
       subtractionHandler.SetNextHandler(multiplicationHandler);
@@ -720,12 +686,11 @@ namespace EventsDelegates
       transposeHandler.SetNextHandler(determinantHandler);
       determinantHandler.SetNextHandler(traceHandler);
       traceHandler.SetNextHandler(diagonalizeHandler);
-      diagonalizeHandler.SetNextHandler(defaultHandler);
 
       MenuApplication menuApp = new MenuApplication(additionHandler);
       menuApp.Run();
 
-      Console.WriteLine("\nВыполнение программы завершено,\nНажмите любую клавишу, чтобы закрыть это окно");
+      Console.WriteLine("Выполнение программы завершено,\nНажмите любую клавишу, чтобы закрыть это окно");
       // Ожидание нажатия клавиши (чтобы окно не закрывалось сразу после выполнения программы)
       Console.ReadKey();
     }
