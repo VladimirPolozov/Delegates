@@ -94,14 +94,14 @@ namespace EventsDelegates
             return matrix;
         }
 
-        public void AutoFill(int extension, int minElement = -10, int MaxElement = 10)
+        public void AutoFill(int extension, int minElement = -10, int maxElement = 10)
         {
             int[] elements = new int[extension * extension];
             var random = new Random();
 
             for (int elementIndex = 0; elementIndex < extension * extension; ++elementIndex)
             {
-                elements[elementIndex] = random.Next(minElement, MaxElement);
+                elements[elementIndex] = random.Next(minElement, maxElement);
             }
 
             MatrixArray = GetMatrixFromArray(elements);
